@@ -18,7 +18,8 @@ public class Main {
         context.addServlet(new ServletHolder(apiServlet), "/api/*");
         context.addServlet(new ServletHolder(resultServlet), "/result");
         context.addServlet(new ServletHolder(registrationServlet), "/registration");
-        context.addServlet(new ServletHolder(moneyTransactionServlet), "/transaction ");
+        context.addServlet(new ServletHolder(moneyTransactionServlet), "/transaction");
+
 
         Server server = new Server(8080);
         server.setHandler(context);

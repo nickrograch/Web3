@@ -1,5 +1,6 @@
 package servlet;
 
+import exception.DBException;
 import model.BankClient;
 import service.BankClientService;
 import util.PageGenerator;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,23 +20,41 @@ public class MoneyTransactionServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        PageGenerator.getInstance().getPage("moneyTransactionPage.html", new HashMap<>());
+        Map<String, Object> pageVariables = createPageVariablesMap(req);
+        resp.getWriter().println(new PageGenerator().getPage("moneyTransactionPage.html", pageVariables));
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> pageVariables = createPageVariablesMap(req);
-        String email = req.getParameter("name");
-        String password = req.getParameter("password");
-        long money = Long.parseLong(req.getParameter("money"));
-        bankClientService.sendMoneyToClient();
+        String name = req.getParameter("senderName");
+        String password = req.getParameter("senderPassword");
+        Long money = Long.valueOf(req.getParameter("money"));
+        String nameTo = req.getParameter("nameTo");
+        try {
+            BankClient clientFrom = bankClientService.getClientByName(name);
+            if (bankClientService.sendMoneyToClient(clientFrom, nameTo, money)){
+                pageVariables.put("message", "The transaction was successful");
+            }
+            else {
+                pageVariables.put("message", "transaction rejected");
+            }
+        } catch (DBException | SQLException e) {
+            pageVariables.put("message", "transaction rejected");
+        }
+
+        resp.getWriter().println(new PageGenerator().getPage("resultPage.html", pageVariables));
+        resp.setContentType("text/html;charset=utf-8");
+        resp.setStatus(HttpServletResponse.SC_OK);
     }
 
     private static Map<String, Object> createPageVariablesMap(HttpServletRequest request){
         Map<String, Object> pageVariables = new HashMap<>();
-        pageVariables.put("name", "");
-        pageVariables.put("password", "");
+        pageVariables.put("senderName", "");
+        pageVariables.put("senderPassword", "");
         pageVariables.put("money", "");
+        pageVariables.put("nameTo", "");
+        pageVariables.put("message", "");
         return pageVariables;
     }
 }

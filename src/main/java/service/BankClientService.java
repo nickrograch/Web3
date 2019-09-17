@@ -23,24 +23,56 @@ public class BankClientService {
         }
     }
 
-    public BankClient getClientByName(String name) {
-        return null;
+    public BankClient getClientByName(String name) throws DBException{
+        try {
+            return getBankClientDAO().getClientByName(name);
+        } catch (SQLException e) {
+            throw new DBException(e);
+        }
     }
 
-    public List<BankClient> getAllClient() {
-        return  null;
+    public List<BankClient> getAllClient() throws DBException{
+        try {
+            return getBankClientDAO().getAllBankClient();
+        } catch (SQLException e) {
+            throw new DBException(e);
+        }
     }
 
-    public boolean deleteClient(String name) {
-        return false;
+    public boolean deleteClient(String name) throws DBException{
+        try {
+            getBankClientDAO().deleteClient(name);
+            return true;
+        } catch (SQLException e) {
+            throw new DBException(e);
+        }
     }
 
     public boolean addClient(BankClient client) throws DBException {
-        return false;
+        try {
+            getBankClientDAO().addClient(client);
+            return true;
+        } catch (SQLException e) {
+            throw new DBException(e);
+        }
     }
 
-    public boolean sendMoneyToClient(BankClient sender, String name, Long value) {
-        return false;
+    public boolean sendMoneyToClient(BankClient sender, String name, Long value) throws SQLException, DBException {
+        BankClientDAO dao = getBankClientDAO();
+        boolean check = false;
+        if (dao.isClientHasSum(sender.getName(), value)){
+            try {
+                BankClient reciever = dao.getClientByName(name);
+                dao.updateClientsMoney(reciever.getName(), reciever.getPassword(), value);
+                value -= value*2;
+                dao.updateClientsMoney(sender.getName(), sender.getPassword(), value);
+                check = true;
+            }
+            catch (SQLException e){
+                throw new DBException(e);
+            }
+        }
+        return check;
     }
 
     public void cleanUp() throws DBException {

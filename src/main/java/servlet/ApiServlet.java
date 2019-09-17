@@ -2,7 +2,6 @@ package servlet;
 
 import com.google.gson.Gson;
 import exception.DBException;
-import model.BankClient;
 import service.BankClientService;
 
 import javax.servlet.ServletException;
@@ -17,11 +16,19 @@ public class ApiServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         BankClientService bankClientService = new BankClientService();
         Gson gson = new Gson();
-        String json;
+        String json = null;
         if (req.getPathInfo().contains("all")) {
-            json = gson.toJson(bankClientService.getAllClient());
+            try {
+                json = gson.toJson(bankClientService.getAllClient());
+            } catch (DBException e) {
+                //ignore
+            }
         } else {
-            json = gson.toJson(bankClientService.getClientByName(req.getParameter("name")));
+            try {
+                json = gson.toJson(bankClientService.getClientByName(req.getParameter("name")));
+            } catch (DBException e) {
+                //ignore
+            }
         }
         resp.getWriter().write(json);
         resp.setStatus(200);
