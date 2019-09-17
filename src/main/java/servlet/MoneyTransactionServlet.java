@@ -32,12 +32,16 @@ public class MoneyTransactionServlet extends HttpServlet {
         Long money = Long.valueOf(req.getParameter("count"));
         String nameTo = req.getParameter("nameTo");
         try {
-            BankClient clientFrom = bankClientService.getClientByName(name);
-            if (bankClientService.sendMoneyToClient(clientFrom, nameTo, money)){
-                pageVariables.put("message", "The transaction was successful");
+            if (bankClientService.getClientByName(name).getPassword().equals(password)) {
+                BankClient clientFrom = bankClientService.getClientByName(name);
+                if (bankClientService.sendMoneyToClient(clientFrom, nameTo, money)) {
+                    pageVariables.put("message", "The transaction was successful");
+                } else {
+                    pageVariables.put("message", "transaction rejected");
+                }
             }
-            else {
-                pageVariables.put("message", "transaction rejected");
+            else{
+                throw new SQLException();
             }
         } catch (DBException | SQLException e) {
             pageVariables.put("message", "transaction rejected");

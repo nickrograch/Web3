@@ -39,17 +39,13 @@ public class BankClientDAO {
     public void updateClientsMoney(String name, String password, Long transactValue) throws SQLException{
         String update = "update bank_clients set money = ? where name = ? and password = ?";
         BankClient client = getClientByName(name);
-        if (client.getPassword().equals(password)) {
-            PreparedStatement stmt = connection.prepareStatement(update);
-            stmt.setLong(1, client.getMoney() + transactValue);
-            stmt.setString(2, name);
-            stmt.setString(3, password);
-            stmt.execute();
-            stmt.close();
-        }
-        else{
-            throw new SQLException();
-        }
+        PreparedStatement stmt = connection.prepareStatement(update);
+        stmt.setLong(1, client.getMoney() + transactValue);
+        stmt.setString(2, name);
+        stmt.setString(3, password);
+        stmt.execute();
+        stmt.close();
+
     }
 
     public BankClient getClientById(long id) throws SQLException {
