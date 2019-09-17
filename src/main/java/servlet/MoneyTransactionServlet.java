@@ -29,7 +29,7 @@ public class MoneyTransactionServlet extends HttpServlet {
         Map<String, Object> pageVariables = createPageVariablesMap(req);
         String name = req.getParameter("senderName");
         String password = req.getParameter("senderPassword");
-        Long money = Long.valueOf(req.getParameter("money"));
+        Long money = Long.valueOf(req.getParameter("count"));
         String nameTo = req.getParameter("nameTo");
         try {
             BankClient clientFrom = bankClientService.getClientByName(name);
@@ -52,7 +52,7 @@ public class MoneyTransactionServlet extends HttpServlet {
         Map<String, Object> pageVariables = new HashMap<>();
         pageVariables.put("senderName", "");
         pageVariables.put("senderPassword", "");
-        pageVariables.put("money", "");
+        pageVariables.put("count", "");
         pageVariables.put("nameTo", "");
         pageVariables.put("message", "");
         return pageVariables;
