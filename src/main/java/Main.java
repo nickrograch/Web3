@@ -21,10 +21,10 @@ public class Main {
         context.addServlet(new ServletHolder(moneyTransactionServlet), "/transaction");
 
 
-        Server server = new Server(8080);
-        server.setHandler(context);
+            Server server = new Server(8080);
+            server.setHandler(context);
 
-        server.start();
-        server.join();
+            server.start();
+            server.join();
     }
 }

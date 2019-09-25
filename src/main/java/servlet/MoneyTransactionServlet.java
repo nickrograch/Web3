@@ -28,7 +28,7 @@ public class MoneyTransactionServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, Object> pageVariables = createPageVariablesMap(req);
         String name = req.getParameter("senderName");
-        String password = req.getParameter("senderPassword");
+        String password = req.getParameter("senderPass");
         Long money = Long.valueOf(req.getParameter("count"));
         String nameTo = req.getParameter("nameTo");
         try {
@@ -55,7 +55,7 @@ public class MoneyTransactionServlet extends HttpServlet {
     private static Map<String, Object> createPageVariablesMap(HttpServletRequest request){
         Map<String, Object> pageVariables = new HashMap<>();
         pageVariables.put("senderName", "");
-        pageVariables.put("senderPassword", "");
+        pageVariables.put("senderPass", "");
         pageVariables.put("count", "");
         pageVariables.put("nameTo", "");
         pageVariables.put("message", "");
