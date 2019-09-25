@@ -21,17 +21,22 @@ public class BankClientDAO {
         stmt.execute("select * from bank_clients");
         ResultSet resultSet = stmt.getResultSet();
         while (resultSet.next()){
-            BankClient bankClient = new BankClient(resultSet.getLong(1), resultSet.getString(2),
-                    resultSet.getString(3), resultSet.getLong(4));
+            long id = resultSet.getLong("id");
+            String name = resultSet.getString("name");
+            String password = resultSet.getString("password");
+            long money = resultSet.getLong("money");
+            BankClient bankClient = new BankClient(id, name, password, money);
             list.add(bankClient);
         }
         return list;
     }
 
     public boolean validateClient(String name, String password) throws SQLException {
-        Statement stmt = connection.createStatement();
-        boolean check = stmt.execute("select * from bank_clients where name = '" + name +
-                "' and password = '" + password + "'");
+        String query = "select * from bank_clients where name = ? and password = ?";
+        PreparedStatement stmt = connection.prepareStatement(query);
+        stmt.setString(1, name);
+        stmt.setString(2, password);
+        boolean check = stmt.execute();
         stmt.close();
         return check;
     }
@@ -49,20 +54,26 @@ public class BankClientDAO {
     }
 
     public BankClient getClientById(long id) throws SQLException {
-        Statement stmt  = connection.createStatement();
-        stmt.execute("select  * from bank_clients where id ='" + id + "'");
+        String query = "select  * from bank_clients where id = ?";
+        PreparedStatement stmt = connection.prepareStatement(query);
+        stmt.setLong(1, id);
+        stmt.execute();
         ResultSet resultSet = stmt.getResultSet();
         resultSet.next();
-        BankClient bankClient = new BankClient(id, resultSet.getString(2), resultSet.getString(3),
-                resultSet.getLong(4));
+        String name = resultSet.getString("name");
+        String password = resultSet.getString("password");
+        long money = resultSet.getLong("money");
+        BankClient bankClient = new BankClient(id, name, password, money);
         resultSet.close();
         stmt.close();
         return bankClient;
     }
 
     public boolean isClientHasSum(String name, Long expectedSum) throws SQLException{
-        Statement stmt  = connection.createStatement();
-        stmt.execute("select  * from bank_clients where name ='" + name + "'");
+        String query = "select  * from bank_clients where name = ?";
+        PreparedStatement stmt = connection.prepareStatement(query);
+        stmt.setString(1, name);
+        stmt.execute();
         ResultSet resultSet = stmt.getResultSet();
         resultSet.next();
         Long moneyAmount = resultSet.getLong(4);
@@ -72,8 +83,10 @@ public class BankClientDAO {
     }
 
     public long getClientIdByName(String name) throws SQLException {
-        Statement stmt = connection.createStatement();
-        stmt.execute("select * from bank_clients where name='" + name + "'");
+        String query = "select  * from bank_clients where name = ?";
+        PreparedStatement stmt = connection.prepareStatement(query);
+        stmt.setString(1, name);
+        stmt.execute();
         ResultSet result = stmt.getResultSet();
         result.next();
         Long id = result.getLong(1);
@@ -83,26 +96,33 @@ public class BankClientDAO {
     }
 
     public BankClient getClientByName(String name) throws SQLException{
-        Statement stmt = connection.createStatement();
-        stmt.execute("select * from bank_clients where name = '" + name + "'");
+        String query = "select  * from bank_clients where name = ?";
+        PreparedStatement stmt = connection.prepareStatement(query);
+        stmt.setString(1, name);
+        stmt.execute();
         ResultSet resultSet = stmt.getResultSet();
         resultSet.next();
-        BankClient bankClient = new BankClient(resultSet.getLong(1), resultSet.getString(2),
-                resultSet.getString(3), resultSet.getLong(4));
+        long id = resultSet.getLong("id");
+        String password = resultSet.getString("password");
+        long money = resultSet.getLong("money");
+        BankClient bankClient = new BankClient(id, name, password, money);
         resultSet.close();
         stmt.close();
         return bankClient;
     }
 
     public void addClient(BankClient client) throws SQLException  {
-        Statement stmt = connection.createStatement();
+        String query = "INSERT INTO bank_clients (name, password, money) VALUES (?, ?, ?)";
+        PreparedStatement stmt = connection.prepareStatement(query);
+        stmt.setString(1, client.getName());
+        stmt.setString(2, client.getPassword());
+        stmt.setLong(3, client.getMoney());
         BankClient check = null;
         try {
             check = getClientByName(client.getName());
         }
         catch (SQLException e){
-            stmt.executeUpdate("INSERT INTO bank_clients (name, password, money) VALUES ('" + client.getName() +
-                    "', '" + client.getPassword() + "', " + client.getMoney() + ")");
+            stmt.executeUpdate();
         }
         stmt.close();
         if (check != null){
@@ -111,9 +131,11 @@ public class BankClientDAO {
     }
 
     public void deleteClient(String name) throws SQLException{
-        Statement stmt = connection.createStatement();
+        String query = "delete from bank_clients where id = ?";
+        PreparedStatement stmt = connection.prepareStatement(query);
         Long id = getClientIdByName(name);
-        stmt.executeUpdate("delete from bank_clients where id = " + id);
+        stmt.setLong(1, id);
+        stmt.executeUpdate();
         stmt.close();
     }
 
